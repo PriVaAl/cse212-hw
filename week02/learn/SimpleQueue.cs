@@ -11,6 +11,11 @@
         var value = queue.Dequeue();
         Console.WriteLine(value);
         // Defect(s) Found:
+        //1. Enqueue uses Insert(0, value), adding the new item to the front of the list 
+        //instead of the back as required.
+        //2. Dequeue access _queue[1], and RemoveAt(1) instead of index 0, so it tries to read
+        //an index that doesn't exists and it crashes with a IndexOutOfRangeException, even 
+        //though the queue wasn't empty. 
 
         Console.WriteLine("------------");
 
@@ -29,6 +34,12 @@
         value = queue.Dequeue();
         Console.WriteLine(value);
         // Defect(s) Found: 
+        //1. Same as Test 1: Enqueue inserts at index 0 (at front), so the items queued
+        //200, 300, 400, ended up store in reverse [400, 300, 200].
+        //2. Becuse of defect 1: Dequeue calls the print in the wrong order : 300, then 200
+        //(expected 200, 300). On the third Dequeue call, the list has only 1 item left ([400] at
+        //index 0), but the code tries to access the _queue[1], which doesn't exist anymore
+        //so it crashes with a IndexOutOfRangeException instead of returning 400.
 
         Console.WriteLine("------------");
 
@@ -45,6 +56,8 @@
             Console.WriteLine("I got the exception as expected.");
         }
         // Defect(s) Found: 
+        //None: The empty check (_queue.Count <= 0) runs before the buggy _queue[1]line, so 
+        //it correctly throws IndexOutOfRangeException and the test pass as is.
     }
 
     private readonly List<int> _queue = new();
@@ -54,7 +67,7 @@
     /// </summary>
     /// <param name="value">Integer value to add to the queue</param>
     private void Enqueue(int value) {
-        _queue.Insert(0, value);
+        _queue.Add(value);
     }
 
     /// <summary>
@@ -66,8 +79,8 @@
         if (_queue.Count <= 0)
             throw new IndexOutOfRangeException();
 
-        var value = _queue[1];
-        _queue.RemoveAt(1);
+        var value = _queue[0];
+        _queue.RemoveAt(0);
         return value;
     }
 }
