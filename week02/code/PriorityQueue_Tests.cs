@@ -97,4 +97,30 @@ public class PriorityQueueTests
         }
     }
 
+    [TestMethod]
+    // Scenario: Enqueue three items (A:9 ,B:9, C:4), where we have multiple values 
+    // with the  the highest priority item (A:9, B:9).with A added first. Call Dequeue 
+    // three times in a row.
+    // Expected Result: A, then B and then C should be returned, and then removed from 
+    // the queue, so subsequent calls return the next-highest priority item, not the 
+    // same one again.
+    // Defect(s) Found: 
+    //The Dequeue founds the highPriorityIndex item and returned its value, but never called 
+    // _queue.RemoveAt(highPriorityIndex) to actually remove it from the queue. This caused 
+    // subsequent Dequeue calls to potentially return the same item again or fail to reflect 
+    // the updated queue state.
+    public void TestPriorityQueue_5()
+    {
+        var priorityQueue = new PriorityQueue();
+        priorityQueue.Enqueue("A",9);
+        priorityQueue.Enqueue("B",9);
+        priorityQueue.Enqueue("C",4);
+        var result = priorityQueue.Dequeue();
+        Assert.AreEqual("A",result);
+        var result2 = priorityQueue.Dequeue();
+        Assert.AreEqual("B",result2);
+         var result3 = priorityQueue.Dequeue();
+        Assert.AreEqual("C",result3);
+    }
+
 }
